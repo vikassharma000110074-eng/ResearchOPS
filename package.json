@@ -1,0 +1,1 @@
+{"name":"researchops-frontend","private":true,"version":"1.9.0","scripts":{"test:ui":"node tests/frontend_dom.cjs"},"devDependencies":{"jsdom":"26.1.0"},"engines":{"node":">=20"}}

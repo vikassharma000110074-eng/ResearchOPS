@@ -1,0 +1,15 @@
+.env
+.env.local
+.env.production
+.venv/
+node_modules/
+data/
+.workflow-data/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+tests/
+qa/
+*.bat
+run_local.sh
+setup.sh
