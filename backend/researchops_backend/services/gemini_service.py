@@ -37,7 +37,10 @@ class GeminiService:
         text = getattr(response, 'text', None)
         if not text:
             raise RuntimeError(f'Gemini model {model} returned an empty response.')
-        return parse_json_object(text)
+        data = parse_json_object(text)
+        if not isinstance(data, dict):
+            raise ValueError('Gemini response must be a JSON object.')
+        return data
 
     @staticmethod
     def _friendly_error(exc: Exception, model: str) -> RuntimeError:
@@ -64,7 +67,22 @@ class GeminiService:
         for model in models:
             for attempt in range(self.max_retries + 1):
                 try:
-                    return self._generate(model, instructions, prompt)
+                    try:
+                        return self._generate(model, instructions, prompt)
+                    except ValueError:
+                        # JSON syntax/type failures are separate from provider retries.
+                        # Keep a single bounded correction even in Workflow mode.
+                        correction = (instructions + '\nThe previous response was invalid JSON. '
+                                      'Return one complete JSON object using the requested fields. '
+                                      'Use double-quoted keys and strings, no trailing commas, '
+                                      'no markdown fences, and no text outside the object. '
+                                      'Keep the answer concise enough to finish the object. '
+                                      'Use only the supplied evidence; do not invent facts or citations.')
+                        try:
+                            return self._generate(model, correction, prompt)
+                        except ValueError as exc:
+                            raise RuntimeError('Gemini returned malformed JSON after one corrective retry. '
+                                               'Retry saved stages; earlier completed stages are preserved.') from exc
                 except Exception as exc:
                     last_error = exc
                     low = str(exc).lower()
