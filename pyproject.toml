@@ -1,0 +1,30 @@
+[project]
+name = "researchops"
+version = "1.9.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.142.2",
+  "uvicorn==0.54.0",
+  "SQLAlchemy==2.1.1",
+  "psycopg[binary]==3.3.6",
+  "pydantic==2.13.5",
+  "google-genai==2.25.0",
+  "tavily-python==0.8.4",
+  "python-dotenv==1.2.3",
+  "reportlab==4.4.9",
+  "vercel-workflow==0.11.0",
+  "vercel-queue==0.9.0",
+]
+
+[tool.vercel]
+entrypoint = "app:app"
+
+[[tool.vercel.workflows]]
+entrypoint = "workflow:wf"
+
+[tool.vercel.fastapi.static]
+cdn = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "backend"]

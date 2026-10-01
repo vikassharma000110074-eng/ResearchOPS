@@ -1,0 +1,112 @@
+{
+  "builder": "@vercel/python 17.0.2",
+  "local_build_only": true,
+  "account_deployed": false,
+  "python": "3.12",
+  "result": {
+    "output": [
+      {
+        "path": "fastapi",
+        "type": "Lambda",
+        "runtime": "python3.12",
+        "handler": "vc__handler__python.vc_handler",
+        "bundleBytes": 144381147,
+        "files": 3441
+      },
+      {
+        "path": "_py_workflows/workflow__wf",
+        "type": "Lambda",
+        "runtime": "python3.12",
+        "triggers": [
+          {
+            "type": "queue/v2beta",
+            "topic": "__researchops_wkf_workflow_*",
+            "consumer": "default"
+          }
+        ],
+        "handler": "vc__handler__python.vc_handler",
+        "bundleBytes": 144381273,
+        "files": 3441
+      },
+      {
+        "path": "app.js",
+        "type": "FileFsRef"
+      },
+      {
+        "path": "config.js",
+        "type": "FileFsRef"
+      },
+      {
+        "path": "history-store.js",
+        "type": "FileFsRef"
+      },
+      {
+        "path": "index.html",
+        "type": "FileFsRef"
+      },
+      {
+        "path": "styles.css",
+        "type": "FileFsRef"
+      },
+      {
+        "path": "vendor/THREE-LICENSE.txt",
+        "type": "FileFsRef"
+      },
+      {
+        "path": "vendor/three.module.min.js",
+        "type": "FileFsRef"
+      }
+    ],
+    "routes": [
+      {
+        "src": "^/((?:api/auth/login|api/history/import|api/research/(?:[^/]+)/cancel|api/research/(?:[^/]+)/restore|api/research/(?:[^/]+)/retry|api/research/run)/?)$",
+        "dest": "/fastapi",
+        "methods": [
+          "POST"
+        ],
+        "transforms": [
+          {
+            "type": "request.path",
+            "op": "set",
+            "args": "/$1"
+          }
+        ]
+      },
+      {
+        "src": "^/((?:api/research/(?:[^/]+)|api/research/(?:[^/]+)/permanent)/?)$",
+        "dest": "/fastapi",
+        "methods": [
+          "DELETE"
+        ],
+        "transforms": [
+          {
+            "type": "request.path",
+            "op": "set",
+            "args": "/$1"
+          }
+        ]
+      },
+      {
+        "handle": "filesystem"
+      },
+      {
+        "src": "/_py_workflows/workflow__wf",
+        "dest": "/_py_workflows/workflow__wf"
+      },
+      {
+        "handle": "rewrite"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/fastapi",
+        "transforms": [
+          {
+            "type": "request.path",
+            "op": "set",
+            "args": "/$1"
+          }
+        ]
+      }
+    ]
+  }
+}

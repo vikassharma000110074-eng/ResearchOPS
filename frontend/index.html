@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#071018" />
+  <meta name="color-scheme" content="dark" />
+  <title>ResearchOps — Decision Intelligence</title>
+  <meta name="description" content="Evidence-backed AI research, verification, forecasting, risk analysis and decision intelligence." />
+  <link rel="modulepreload" href="./vendor/three.module.min.js" crossorigin />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="stage" aria-hidden="true">
+    <canvas id="research-gl"></canvas>
+    <div class="grid-plane"></div>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+  </div>
+
+  <div id="boot" class="boot" aria-live="polite">
+    <div class="boot-mark">
+      <span class="boot-ring r1"></span>
+      <span class="boot-ring r2"></span>
+      <span class="boot-core"></span>
+    </div>
+    <div class="boot-copy"><b>ResearchOps</b><span>Initializing research workspace</span></div>
+  </div>
+
+  <header class="topbar">
+    <button class="brand" data-route="workspace" aria-label="Open research workspace">
+      <span class="brand-mark"><i></i><i></i><i></i></span>
+      <span>ResearchOps</span>
+    </button>
+    <div class="topbar-center">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Connecting to research engine…</span>
+    </div>
+    <div class="topbar-right">
+      <button class="top-new-chat" id="connectButton" type="button">Connect</button>
+      <button class="top-new-chat" id="newChatTop" type="button"><span>＋</span> New chat</button>
+      <button class="icon-btn" id="motionToggle" type="button" title="Toggle ambient motion" aria-label="Toggle ambient motion">
+        <svg viewBox="0 0 24 24"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <nav class="rail" aria-label="ResearchOps navigation">
+    <div class="rail-line"></div>
+    <button class="rail-item active" data-route="workspace"><span>01</span><b>Workspace</b></button>
+    <button class="rail-item" data-route="history"><span>02</span><b>History</b></button>
+    <button class="rail-item" data-route="trail"><span>03</span><b>Research Trail</b></button>
+    <button class="rail-item" data-route="report"><span>04</span><b>Final Report</b></button>
+    <button class="rail-new-chat" id="newChatRail" type="button"><span>＋</span><b>New chat</b></button>
+    <div class="rail-footer">
+      <small>Evidence engine</small>
+      <b id="railEngine">standby</b>
+    </div>
+  </nav>
+
+  <main class="app-shell">
+    <div id="demoBanner" class="demo-banner hidden" role="status">OFFLINE DEMO — simulated workflow only. No web searches, AI calls or verified findings.</div>
+    <section id="workspace" class="view active" data-view="workspace">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span> Decision intelligence / research agent</div>
+          <h1>Turn ambiguity into<br><em>traceable evidence.</em></h1>
+          <p>Start a new research chat, decompose a complex decision, sweep the web adaptively, verify claims, audit conflicting evidence, quantify risk, forecast 1–5 years, and turn the result into an actionable decision plan.</p>
+          <div class="hero-micro">
+            <span><i class="pulse-dot"></i> source verification</span>
+            <span>parallel retrieval</span>
+            <span>MapReduce processing</span>
+            <span>decision audit trail</span>
+          </div>
+        </div>
+        <div class="hero-instrument" aria-hidden="true">
+          <div class="instrument-label">LIVE RESEARCH GRAPH</div>
+          <div class="instrument-orbit o1"></div>
+          <div class="instrument-orbit o2"></div>
+          <div class="instrument-orbit o3"></div>
+          <div class="instrument-node n1"></div>
+          <div class="instrument-node n2"></div>
+          <div class="instrument-node n3"></div>
+          <div class="instrument-node n4"></div>
+          <div class="instrument-core"></div>
+          <div class="instrument-caption"><span>Evidence</span><span>Claims</span><span>Decision</span></div>
+        </div>
+      </section>
+
+      <section class="workspace-grid">
+        <article class="glass-panel form-panel">
+          <div class="panel-head">
+            <div>
+              <span class="panel-kicker">01 / RESEARCH BRIEF</span>
+              <h2>Define the decision</h2>
+            </div>
+            <span class="panel-tag">INPUT</span>
+          </div>
+          <label class="field">
+            <span>Problem statement</span>
+            <textarea id="question" rows="5" placeholder="Example: Should we launch a premium EV subscription service for urban professionals in Bengaluru?"></textarea>
+          </label>
+          <div class="two-col">
+            <label class="field"><span>Geography <small>optional</small></span><input id="geography" placeholder="Bengaluru, India" /></label>
+            <label class="field"><span>Industry <small>optional</small></span><input id="industry" placeholder="Electric mobility / subscription services" /></label>
+          </div>
+        </article>
+
+        <article class="glass-panel config-panel">
+          <div class="panel-head">
+            <div>
+              <span class="panel-kicker">02 / ANALYSIS CONTROL</span>
+              <h2>Configure the research</h2>
+            </div>
+            <span class="panel-tag">CONTROL</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-copy"><b>Forecast horizon</b><span>Project 1–5 years beyond the evidence base.</span></div>
+            <div class="segmented" id="forecastYears">
+              <button data-value="1">1Y</button><button data-value="2">2Y</button><button data-value="3">3Y</button><button data-value="4">4Y</button><button data-value="5" class="active">5Y</button>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <div class="control-copy"><b>Research tasks</b><span>How many independent questions should the planner create?</span></div>
+            <div class="range-wrap"><input id="maxTasks" type="range" min="3" max="5" value="3" /><output id="maxTasksOut">3</output></div>
+          </div>
+
+          <div class="control-row">
+            <div class="control-copy"><b>Research depth</b><span>No fixed source count. ResearchOps expands queries toward primary evidence, counter-evidence and uncovered gaps until the selected depth or evidence saturation is reached.</span></div>
+            <div class="depth-segmented" id="researchMode">
+              <button data-value="Standard" class="active">Standard</button>
+              <button data-value="Deep">Deep</button>
+              <button data-value="Exhaustive">Exhaustive</button>
+            </div>
+          </div>
+          <div class="research-guardrails">
+            <span>✓ Primary-source search</span><span>✓ Counter-evidence</span><span>✓ Conflict audit</span><span>✓ Adaptive saturation</span>
+          </div>
+          <p class="depth-note">Deep and Exhaustive modes run substantially more searches and may use more Tavily/Gemini quota.</p>
+
+          <div class="control-row decision-control">
+            <div class="control-copy"><b>AI decision suggestion</b><span>Optional advisory synthesis based only on verified evidence, forecast and risk.</span></div>
+            <label class="switch"><input id="decisionSupport" type="checkbox" /><span></span></label>
+          </div>
+
+          <div id="decisionStyleWrap" class="decision-style hidden">
+            <label class="field compact"><span>Decision style</span>
+              <select id="decisionStyle">
+                <option>Balanced</option>
+                <option>Risk-conscious</option>
+                <option>Growth-oriented</option>
+              </select>
+            </label>
+          </div>
+
+          <details class="forecast-data">
+            <summary><span>Optional forecast data</span><small>Baseline + historical series</small></summary>
+            <div class="forecast-body">
+              <label class="field compact"><span>Current baseline</span><input id="baseline" type="number" min="0" step="any" placeholder="100" /></label>
+              <div class="history-head"><span>Historical data</span><button id="addHistory" type="button">+ Add row</button></div>
+              <div id="historyRows" class="history-rows"></div>
+              <p>Four or more year/value points enable the trend model. Otherwise, ResearchOps uses evidence-based scenarios when defensible growth rates are available.</p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section class="launch-strip">
+        <div class="launch-copy">
+          <span class="launch-index">03</span>
+          <div><b>Ready to research</b><p>ResearchOps will only elevate claims that pass the verification threshold.</p></div>
+        </div>
+        <button id="startResearch" class="primary-btn" type="button"><span>Start research</span><i>↗</i></button>
+      </section>
+
+      <section id="progressPanel" class="progress-panel hidden" aria-live="polite">
+        <div class="progress-head"><span>SAVED RESEARCH · STAGE PROGRESS</span><b id="progressPct">0%</b></div>
+        <div class="progress-track"><i id="progressBar"></i></div>
+        <div class="progress-stage"><span id="progressStage">Queued</span><small id="progressId"></small></div>
+        <div class="stage-lights">
+          <span>Plan</span><span>Retrieve</span><span>MapReduce</span><span>Verify</span><span>Audit</span><span>Synthesize</span><span>Forecast</span>
+        </div>
+        <p class="progress-note">Progress reflects saved stages, not a time estimate. You can open New Chat or close this page; the worker continues.</p>
+        <p id="jobDetails" class="progress-note"></p>
+        <p id="jobError" class="job-error hidden" role="alert"></p>
+        <div class="job-actions"><button id="cancelResearch" class="ghost-btn hidden" type="button">Cancel research</button><button id="retryResearch" class="ghost-btn hidden" type="button">Retry saved stages</button></div>
+      </section>
+
+      <section id="resultsPanel" class="results hidden">
+        <div class="results-head">
+          <div><span class="panel-kicker">RESEARCH COMPLETE</span><h2>Decision intelligence</h2></div>
+          <button id="newResearch" class="ghost-btn">＋ New chat</button>
+        </div>
+
+        <div id="metricGrid" class="metric-grid"></div>
+
+        <article id="decisionCard" class="decision-terminal hidden">
+          <div class="decision-left">
+            <span class="panel-kicker">AI DECISION SUGGESTION</span>
+            <h3 id="decisionStance">—</h3>
+            <p id="decisionSummary"></p>
+            <div id="decisionReasons" class="decision-points"></div>
+          </div>
+          <div class="confidence-dial">
+            <svg viewBox="0 0 120 120">
+              <circle class="dial-track" cx="60" cy="60" r="48"></circle>
+              <circle id="confidenceArc" class="dial-value" cx="60" cy="60" r="48"></circle>
+            </svg>
+            <div><b id="confidencePct">0%</b><span>AI confidence</span><small id="confidenceLabel">—</small></div>
+          </div>
+          <div class="decision-foot"><span>Advisory only · confidence reflects evidence strength, not guaranteed outcome.</span></div>
+        </article>
+
+        <article class="glass-panel executive">
+          <div class="panel-head"><div><span class="panel-kicker">EXECUTIVE SYNTHESIS</span><h2>What the evidence says</h2></div><span class="panel-tag">VERIFIED</span></div>
+          <p id="executiveSummary"></p>
+          <div id="executiveSources" class="source-chips"></div>
+        </article>
+
+        <div class="result-tabs" role="tablist">
+          <button class="active" data-result-tab="evidence">Evidence</button>
+          <button data-result-tab="opportunities">Opportunities</button>
+          <button data-result-tab="risk">Risk</button>
+          <button data-result-tab="forecast">Forecast</button>
+          <button data-result-tab="sources">Sources</button>
+        </div>
+
+        <div class="result-tab active" id="tab-evidence"></div>
+        <div class="result-tab" id="tab-opportunities"></div>
+        <div class="result-tab" id="tab-risk"></div>
+        <div class="result-tab" id="tab-forecast"></div>
+        <div class="result-tab" id="tab-sources"></div>
+      </section>
+    </section>
+
+
+    <section id="history" class="view" data-view="history">
+      <div class="page-title history-title">
+        <span class="panel-kicker">RESEARCH ARCHIVE</span>
+        <h1>Research chats & history</h1>
+        <p>Every research job is saved in your workspace, including running and failed jobs. Reopen reports, watch progress, or reuse a brief from desktop or mobile.</p>
+      </div>
+      <div class="history-toolbar glass-panel">
+        <label class="history-search"><span>Search archive</span><input id="historySearch" type="search" placeholder="Search problem, geography or industry" /></label>
+        <label class="history-filter"><span>Status</span><select id="historyStatus"><option value="all">All research</option><option value="completed">Completed</option><option value="running">Running</option><option value="queued">Queued</option><option value="failed">Failed</option><option value="cancelled">Cancelled</option><option value="archived">Archived</option></select></label>
+        <button id="refreshHistory" class="ghost-btn" type="button">Refresh</button><button id="newChatHistory" class="primary-mini" type="button">＋ New chat</button>
+      </div>
+      <div class="history-meta"><span id="historyCount">0 research runs</span><small>Saved in your workspace</small></div>
+      <div id="historyLoading" class="history-loading hidden">Loading research archive…</div>
+      <div id="historyEmpty" class="empty-state hidden"><div class="empty-orbit"></div><h3>No saved research yet</h3><p>Start a research job and it will immediately appear here.</p><button data-route="workspace" class="ghost-btn">Open workspace</button></div>
+      <p id="storageUsage" class="progress-note">Loading database usage…</p>
+      <div class="history-import"><button id="exportHistory" class="ghost-btn" type="button">Export completed history</button><button id="importBrowserHistory" class="ghost-btn" type="button">Import old browser reports</button><label class="ghost-btn file-button">Import history JSON<input id="importHistoryFile" type="file" accept="application/json,.json" hidden /></label></div>
+      <div id="historyList" class="history-list"></div>
+      <button id="loadMoreHistory" class="ghost-btn hidden" type="button">Load more research</button>
+    </section>
+
+    <section id="trail" class="view" data-view="trail">
+      <div class="page-title"><span class="panel-kicker">RESEARCH PROVENANCE</span><h1>Research trail</h1><p>See how the original question was decomposed, searched and processed before any decision synthesis was produced.</p></div>
+      <div id="trailEmpty" class="empty-state"><div class="empty-orbit"></div><h3>No research trail yet</h3><p>Run a research job from the workspace. Every task and query will appear here.</p><button data-route="workspace" class="ghost-btn">Open workspace</button></div>
+      <div id="trailContent" class="hidden">
+        <div id="taskTimeline" class="task-timeline"></div>
+        <article class="glass-panel engine-panel"><span class="panel-kicker">PROCESSING ENGINE</span><h2>MapReduce trace</h2><pre id="mapreduceTrace"></pre></article>
+      </div>
+    </section>
+
+    <section id="report" class="view" data-view="report">
+      <div class="page-title"><span class="panel-kicker">EXECUTIVE OUTPUT</span><h1>Final report</h1><p>A source-linked research record with decision suggestion, risk analysis, forecasting and downloadable PDF charts.</p></div>
+      <div id="reportEmpty" class="empty-state"><div class="empty-orbit"></div><h3>No completed report yet</h3><p>Complete a research run to unlock the report and downloads.</p><button data-route="workspace" class="ghost-btn">Open workspace</button></div>
+      <div id="reportContent" class="hidden">
+        <div class="report-actions">
+          <a id="downloadMarkdown" class="primary-btn download" href="#"><span>Download Markdown</span><i>↓</i></a>
+          <a id="downloadPdf" class="ghost-btn download" href="#"><span>Download PDF + charts</span><i>↓</i></a>
+        </div>
+        <div id="reportDecision"></div>
+        <article class="report-sheet">
+          <div class="report-sheet-head"><span>ResearchOps / Decision Intelligence</span><span id="reportId">—</span></div>
+          <div id="reportStructured"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <button class="active" data-route="workspace"><span>＋</span><b>New chat</b></button>
+    <button data-route="history"><span>◷</span><b>History</b></button>
+    <button data-route="trail"><span>⌘</span><b>Trail</b></button>
+    <button data-route="report"><span>▤</span><b>Report</b></button>
+  </nav>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <dialog id="connectionDialog" class="connection-dialog">
+    <form id="connectionForm">
+      <span class="panel-kicker">WORKSPACE CONNECTION</span><h2>Open your research workspace</h2>
+      <p>Reports are shared with people who have this workspace password. Use the same workspace on desktop and mobile.</p>
+      <label class="field"><span>Workspace address <small>automatic on Vercel</small></span><input id="backendAddress" type="url" placeholder="Same as this website" readonly /></label>
+      <label class="field"><span>Workspace password</span><input id="workspacePassword" type="password" autocomplete="current-password" placeholder="Not your Gemini or Tavily API key" /></label>
+      <p id="connectionHint" class="progress-note">Enter the workspace password set in Vercel Environment Variables.</p>
+      <p id="connectionError" class="job-error" role="alert"></p>
+      <div class="job-actions"><button class="primary-btn" type="submit">Connect workspace</button><button id="signOut" class="ghost-btn" type="button">Sign out</button><button class="ghost-btn" type="button" onclick="document.getElementById('connectionDialog').close()">Close</button></div>
+    </form>
+  </dialog>
+  <script src="./config.js"></script>
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+  <script src="./history-store.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
