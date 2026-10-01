@@ -64,7 +64,7 @@ def health():
     except Exception:
         missing.append('Database connection');worker='unknown'
     return {'status':'configuration_required' if missing else 'ok','missing':missing,
-        'version':app.version,'authentication_required':bool(s.workspace_password) or s.environment=='production',
+        'version':app.version,'authentication_required': not s.public_access and (bool(s.workspace_password) or s.environment == 'production'),
         'execution_mode':s.execution_mode,'worker_status':worker,
         'history':'persistent-database','mapreduce_engine':s.hadoop_mode+'-mapreduce',
         'demo_mode':s.demo_mode}

@@ -32,6 +32,7 @@ class Settings:
         self.max_source_chars = max(1000, min(12000, int(os.getenv('MAX_SOURCE_CHARS', '6500'))))
         self.adaptive_source_hard_cap = max(40, min(1000, int(os.getenv('ADAPTIVE_SOURCE_HARD_CAP', '60'))))
         self.cors_origins = [x.strip().rstrip('/') for x in os.getenv('CORS_ORIGINS', '').split(',') if x.strip()]
+        self.public_access = os.getenv('PUBLIC_ACCESS', 'false').lower() == 'true'
         self.workspace_password = os.getenv('WORKSPACE_PASSWORD', '')
         self.session_secret = os.getenv('SESSION_SECRET', '')
         self.execution_mode = os.getenv('EXECUTION_MODE', 'vercel-workflow' if os.getenv('VERCEL') else 'local-worker').lower()
@@ -51,8 +52,8 @@ class Settings:
             if not self.tavily_api_key: missing.append('TAVILY_API_KEY')
         if self.environment == 'production':
             if not self.database_url.startswith('postgresql+psycopg://'): missing.append('DATABASE_URL (PostgreSQL)')
-            if len(self.workspace_password) < 16: missing.append('WORKSPACE_PASSWORD (16+ characters)')
-            if len(self.session_secret) < 32: missing.append('SESSION_SECRET (32+ random characters)')
+            if not self.public_access and len(self.workspace_password) < 16: missing.append('WORKSPACE_PASSWORD (16+ characters)')
+            if not self.public_access and len(self.session_secret) < 32: missing.append('SESSION_SECRET (32+ random characters)')
             if self.demo_mode: missing.append('DEMO_MODE must be false in production')
             if self.execution_mode != 'vercel-workflow': missing.append('EXECUTION_MODE=vercel-workflow')
             if '*' in self.cors_origins: missing.append('CORS_ORIGINS must contain explicit frontend origins')

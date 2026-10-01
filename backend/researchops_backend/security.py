@@ -27,6 +27,8 @@ def issue_session(password):
 
 def require_access(request: Request):
     s=get_settings()
+    if s.public_access:
+        return
     if s.environment=='local' and not s.workspace_password:return
     token=request.headers.get('Authorization','').removeprefix('Bearer ')
     try:
